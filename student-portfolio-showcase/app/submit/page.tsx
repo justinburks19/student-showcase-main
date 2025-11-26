@@ -1,7 +1,12 @@
 "use client"; // Enable client-side rendering
 import { useState } from "react";
 import React from "react";
-
+import {FormSection} from "./selections/formSection"; // Import the reusable FormSection component
+import {TextField} from "./selections/textField"; // Import the reusable TextField component
+import {Checkbox} from "./selections/checkbox"; // Import the reusable Checkbox component
+import {YearDropdown} from "./selections/yearsDrop"; // Import the reusable YearDropdown component
+import {SemesterDropdown} from "./selections/semesterDrop"; // Import the reusable SemesterDropdown component
+import {CheckBoxExplained} from "./selections/checkBoxExplained"; // Import the reusable CheckBoxExplained component
 export default function Page() {
   const [submit, setSubmit] = useState(false); // State to track form submission
   const [addProject, setAddProject] = useState(1); // State to track number of projects added
@@ -57,15 +62,15 @@ export default function Page() {
     
     //validation fields
     const requiredIds = [
-        `projectName${index}`,
-        `projectDescription${index}`,
-        `technologiesUsed${index}`,
-        `demoUrl${index}`,
-        `repositoryUrl${index}`,
+        `projectName-${index}`, // Updated to use dynamic index
+        `projectDescription-${index}`,
+        `technologiesUsed-${index}`,
+        `demoUrl-${index}`,
+        `repositoryUrl-${index}`,
         `semester-${index}`,
-        `startDate${index}`,
-        `endDate${index}`,
-        `screenshotUrl${index}`,
+        `startDate-${index}`,
+        `endDate-${index}`,
+        `screenshotUrl-${index}`,
     ];
 
     // Check if all required fields are filled
@@ -88,185 +93,61 @@ export default function Page() {
   };
 
   // Handle what information saves and downloads as JSON file
-  const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // STOP FORM FROM REFRESHING
+const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault(); // STOP FORM FROM REFRESHING
 
-    if (submit === true) return; // Prevent multiple submissions
-    setSubmit(true); // Mark as submitted
+  if (submit) return; // Prevent multiple submissions
+  setSubmit(true); // Mark as submitted
 
-    const form = event.currentTarget; // Get the form element
-    const formData = new FormData(form); // Create FormData object from the form
+  const form = event.currentTarget; // Get the form element
+  const formData = new FormData(form); // Create FormData object from the form
 
-    const data: { [key: string]: string | File } = {}; // Initialize an empty object to hold form data, the key is string and value will be a string or File
-    formData.forEach((value, key) => {
-      // Iterate over each form entry
-      data[key] = value;
-    });
+  const data: { [key: string]: string | File } = {};
 
-    const jsonData = JSON.stringify(data, null, 2); // Convert form data to JSON string with indentation
+  // Grab basic fields (will get the *last* value for repeated names)
+  formData.forEach((value, key) => {
+    data[key] = value;
+  });
 
-    const downloadJson = formData.get("downloadJson"); // Check if the user wants to download the JSON file
+  // ----- FIX FOR CHECKBOX GROUPS -----
+  // Collect ALL checked values for these fields:
+  const multiValueFields = ["major", "skills", "contactMethods", "technologiesUsed-1"];
 
-    if (downloadJson) {
-      // If downloadJson is true, create and download the JSON file
-      const blob = new Blob([jsonData], { type: "application/json" }); // Create a Blob from the JSON string
-      const url = URL.createObjectURL(blob); // Create a URL for the Blob
+  multiValueFields.forEach((value) => {
+    const values = formData
+      .getAll(value)     // all values for that name
+      .map((v) => v.toString().trim()) // to string and trim whitespace
+      .filter(Boolean);  // drop empties
 
-      const a = document.createElement("a"); // Create a temporary anchor element
-      a.href = url; // Set the href to the Blob URL
-      a.download = "portfolio_submission.json"; // Set the download attribute with the filename
-      a.click(); // Programmatically click the anchor to trigger the download
-
-      URL.revokeObjectURL(url); // Release the Blob URL
+    if (values.length > 0) {
+      // store as comma-separated string
+      data[value] = values.join(", ");
+    } else {
+      data[value] = "";
     }
+  });
+  // -----------------------------------
 
-    console.log("Form submitted:", data);
-  };
-  // Reusable Form Section Component
-  type FormSectionProps = {
-    title: string;
-    subtitle?: string;
-    children: React.ReactNode;
-  };
-  // FormSection component to structure form sections
-  function FormSection({ title, subtitle, children }: FormSectionProps) {
-    return (
-      <section className="mb-10">
-        <h2 className="italic text-4xl font-semibold text-black mb-1 text-center">
-          {title}
-        </h2>
-        {subtitle && (
-          <p className="text-xl font-medium text-gray-600 mb-6 text-center italic">
-            {subtitle}
-          </p>
-        )}
-        {children}
-      </section>
-    );
+  const jsonData = JSON.stringify(data, null, 2); // Convert form data to JSON string with indentation
+
+  const downloadJson = formData.get("downloadJson");
+
+  if (downloadJson) {
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "portfolio_submission.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
   }
 
-  // Reusable TextField Component
-  type TextFieldProps = {
-    id: string;
-    name: string;
-    label: string;
-    type?: string;
-    placeholder?: string;
-    required?: boolean;
-    className?: string;
-    rows?: number;
-    textarea?: boolean;
-    checkbox?: boolean;
-    borderColor?: string;
-    divWrapperClass?: string;
-  };
+  console.log("Form submitted:", data);
+};
 
-  // Reusable TextField Component
-  function TextField({
-    id,
-    name,
-    label,
-    type = "text",
-    placeholder = "",
-    required = false,
-    className = "",
-    rows = 4,
-    textarea = false,
 
-    divWrapperClass = "",
-  }: TextFieldProps) {
-    //contact methods
-
-    return (
-      <div className={divWrapperClass}>
-        <div className={`mb-3`}>
-          <label
-            htmlFor={id}
-            className="block text-sm font-medium text-gray-700 align-center mb-1"
-          >
-            <h1 className="text-2xl font-md font-semibold">{label}</h1>
-          </label>
-          {textarea ? (
-            <textarea
-              id={id}
-              name={name}
-              rows={rows}
-              placeholder={placeholder}
-              required={required}
-              className={className || basicInfo}
-            />
-          ) : (
-            <input
-              id={id}
-              name={name}
-              type={type}
-              placeholder={placeholder}
-              required={required}
-              className={className || basicInfo}
-            />
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Reusable checkbox component
-  type CheckboxProps = {
-    name: string;
-    label: string;
-    mapValue: string[];
-    required?: boolean;
-    divWrapperClass?: string;
-  };
-  // Checkbox component to render a list of checkboxes
-  function Checkbox({
-    name,
-    label,
-    mapValue,
-    required = true,
-    divWrapperClass = "",
-  }: CheckboxProps) {
-    return (
-      <div className={divWrapperClass}>
-        <label
-          htmlFor={name}
-          className="block font-medium text-gray-700 mb-1 border-black"
-        >
-          <h1 className="text-2xl font-md font-semibold">{label}</h1>
-        </label>
-        <div
-          className={`flex border-black flex-wrap gap-2 mb-2 border-x-[2px] border-t-[3px] border-b-[5px] p-2 rounded-2xl font-bold w-[90%]  mx-auto`}
-        >
-          {mapValue.map((skill: string) => (
-            <div key={skill} className="flex flex-wrap mx-auto mb-1">
-              <input
-                type="checkbox"
-                id={skill}
-                name={name}
-                value={skill}
-                className="mr-1"
-                required={required}
-              />
-              <label
-                htmlFor={skill}
-                className="text-md font-medium text-gray-700 "
-              >
-                {skill}
-              </label>
-            </div>
-          ))}
-
-          <input
-            type="text"
-            id="skills-other"
-            name={name}
-            placeholder={`Other ${label}`}
-            className={`border-gray-400 text-center w-full border rounded-2xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black border-l-[2px] border-t-[2px] border-r-[2px] border-b-[2px]`}
-          />
-        </div>
-      </div>
-    );
-  }
     // Contact methods options
   const contactMethods = [
   "Email",
@@ -277,154 +158,6 @@ export default function Page() {
   "Discord",
   "X / Twitter",
 ]
-
-      //Resuable checkbox with a label
-    type CheckBoxExplainedProps = {
-    name: string;
-    label: string;
-    mapValue: string[],
-    required?: boolean,
-  }
-  // Checkbox component to render a list of checkboxes with explanation
-  function CheckBoxExplained({ name, label, mapValue, required = true }: CheckBoxExplainedProps) { 
-    //should take checkbox props and place a label next to it to fill in explanation
-  const [select, setSelect] = useState<Record<string, boolean>>({}); // State to track selected checkboxes, Record with string keys and boolean values
-
-  const handleChange = (method: string) =>  // Handle checkbox state change
-    (e: React.ChangeEvent<HTMLInputElement>) => { // Event handler for checkbox change, e is the event object, react change event for input element
-        const checked = e.target.checked;
-        setSelect((prev) => ({
-            ...prev, // Spread previous state
-            [method]: checked, // Update the specific method's checked state
-        }));
-  };
-    return (
-    <>
-        <label
-            htmlFor={name}
-            className="block font-medium text-gray-700 mb-1 border-black"
-            >
-            <h1 className="text-2xl font-md font-semibold">{label}</h1>
-        </label>
-        <div
-          className={`flex border-black flex-wrap gap-2 mb-2 border-x-[2px] border-t-[3px] border-b-[5px] p-2 rounded-2xl font-bold w-[90%]  mx-auto justify-center align-center`}
-        >
-            {mapValue.map((method: string, index: number) => {
-                const id = `${name}-checkbox-${method}`;
-                const explainationID= `${method}-explanation`;
-                const isChecked = !!select[method];
-                return (
-                <div key={method} className="flex flex-col mx-auto mb-1">
-              <input
-                type="checkbox"
-                id={id}
-                name={name}
-                value={method}
-                className="mr-1"
-                required={required && index === 0} // Make at least one required
-                onChange={handleChange(method)}
-                checked={isChecked}
-              />
-              <label
-                htmlFor={id}
-                className="text-md font-medium text-gray-700 "
-              >
-                {method}
-              </label>
-              {isChecked && (
-              <input
-                type="text"
-                id={explainationID}
-                name={`${method}-explanation`}
-                placeholder={`Please provide your ${method} details`}
-                className={`border-gray-400 text-center w-full border rounded-2xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black border-l-[2px] border-t-[2px] border-r-[2px] border-b-[2px]`}
-                />
-                )}
-                </div>
-                );
-            }
-            )}
-        </div>
-    </>
-    );
-  }
-
-  //Resuable year selection dropdown component
-  type YearDropdownProps = {
-    id: string;
-    name: string;
-    label: string;
-    required?: boolean;
-  };
-  // YearDropdown component to select graduation year
-    function YearDropdown({id, name, label, required = true}: YearDropdownProps) {
-        const years = Array.from({length: 10}, (_, i) => new Date().getFullYear() + i); // Generate an array of the next 10 years
-
-        return (
-            <div className="mb-3">
-                <label htmlFor={id} className="block text-sm font-medium text-gray-700 align-center mb-1">
-                    <h1 className="text-2xl font-md font-semibold">{label}</h1>
-                </label>
-                <select
-                    id={id}
-                    name={name}
-                    required={required}
-                    className={basicInfo}
-                >
-                    <option value="" disabled selected>Select your graduation year</option>
-                    {years.map((year) => (
-                        <option key={year} value={year}>{year}</option>
-                    ))}
-                </select>
-            </div>
-        );
-    }
-        
-  //Resuable Semester selection dropdown component
-  type SemesterDropdownProps = {
-    id: string;
-    name: string;
-    label: string;
-    required?: boolean;
-    divClassWrapper?: string;
-  };
-    // SemesterDropdown component to select semester
-    function SemesterDropdown({id, name, label, required = true, divClassWrapper = ""}: SemesterDropdownProps) {
-        const semesters = ["Spring", "Summer", "Fall", "Winter"]; // List of semesters
-        //collect the past 10 years for selection
-        const currentYear = new Date().getFullYear();
-        const years = Array.from({length: 10}, (_, i) => currentYear - i); // Generate an array of the past 10 years
-        // Combine semesters and years for options
-        const semesterYearOptions = [];
-        for (const year of years) {
-            for (const semester of semesters) {
-                semesterYearOptions.push(`${semester} ${year}`);
-            }
-        }
-        return (
-            <div className={`mb-3 ${divClassWrapper}`}>
-                <label htmlFor={id} className="block text-sm font-medium text-gray-700 align-center mb-1">
-                    <h1 className="text-2xl font-md font-semibold">{label}</h1>
-                </label>
-                <select
-                    id={id}
-                    name={name}
-                    required={required}
-                    className={basicInfo}
-                >
-                    <option value="" disabled selected>Select semester</option>
-                    {semesterYearOptions.map((option) => (
-                        <option key={option} value={option}>{option}</option>
-                    ))}
-                </select>
-            </div>
-        );
-    }
-
-
-    
-
-  
   
   return (
     <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-5">
@@ -460,6 +193,7 @@ export default function Page() {
                   label="Full Name"
                   placeholder="e.g., Justin Burks"
                   required={true}
+                  className={basicInfo}
                 />
 
                 {/* Email Address Field✅ */}
@@ -470,6 +204,7 @@ export default function Page() {
                   type="email"
                   placeholder="e.g., justin.burks@login.cuny.edu"
                   required={true}
+                  className={basicInfo}
                 />
               </div>
 
@@ -481,6 +216,7 @@ export default function Page() {
                 type="url"
                 placeholder="e.g., https://yourheadshoturl.com/image.jpg"
                 required={false}
+                className={basicInfo}
               />
 
               {/* Bio Field ✅*/}
@@ -491,6 +227,7 @@ export default function Page() {
                 placeholder="A brief bio about yourself"
                 required={true}
                 textarea={true}
+                className={basicInfo}
                 rows={4}
               />
 
@@ -503,6 +240,7 @@ export default function Page() {
                 required={true}
                 textarea={true}
                 rows={4}
+                className={basicInfo}
               />
 
               {/*Major/Field of Study ✅ */}
@@ -519,6 +257,7 @@ export default function Page() {
                 name="graduationYear"
                 label="Graduation Year"
                 required={true}
+                className={basicInfo}
               />
 
               {/* Contact options ✅*/}
@@ -526,7 +265,7 @@ export default function Page() {
                 name="contactMethods"
                 label="Preferred Contact Methods"
                 mapValue={contactMethods}
-                required={false}
+                required={true}
               />
 
               {/* skills selction ✅*/}
@@ -546,6 +285,7 @@ export default function Page() {
                 required={true}
                 textarea={true}
                 rows={4}
+                className={basicInfo}
               />
 
               <h2 className="text-4xl font-bold text-black mb-6 text-center border-t-[6px] border-blue-700 rounded-xl pt-2 italic">
@@ -560,16 +300,17 @@ export default function Page() {
                       {/* Semester Name Field ✅*/}
                       <SemesterDropdown
                         divClassWrapper={"col-span-2"}
-                        id={`semester-${index}`}
-                        name={`semester-${index}`}
-                        label={`Project ${index + 1}`}
+                        id={`semester-${projectIndex}`}
+                        name={`semester-${projectIndex}`}
+                        label={`Project ${projectIndex}`}
                         required={true}
+                        className={basicInfo}
                       />
                       {/*Start date Field ✅*/}
                       <TextField
                         divWrapperClass={"flex flex-col mx-auto w-full"}
-                        id="startDate"
-                        name="startDate"
+                        id={`startDate-${projectIndex}`}
+                        name={`startDate-${projectIndex}`}
                         label="Project Start Date"
                         type="date"
                         required={true}
@@ -580,8 +321,8 @@ export default function Page() {
                       {/* End Date Field ✅*/}
                       <TextField
                         divWrapperClass={"flex flex-col mx-auto w-full"}
-                        id="endDate"
-                        name="endDate"
+                        id={`endDate-${projectIndex}`}
+                        name={`endDate-${projectIndex}`}
                         label="Project End Date"
                         type="date"
                         required={true}
@@ -595,8 +336,8 @@ export default function Page() {
                         divWrapperClass={
                           "col-span-2 flex flex-col mx-auto w-full"
                         }
-                        id="projectName"
-                        name="projectName"
+                        id={`projectName-${projectIndex}`}
+                        name={`projectName-${projectIndex}`}
                         label="Project Name"
                         placeholder="e.g., Personal Portfolio Website"
                         required={true}
@@ -609,8 +350,8 @@ export default function Page() {
                         divWrapperClass={
                           "col-span-2 flex flex-col mx-auto w-full"
                         }
-                        id="projectDescription"
-                        name="projectDescription"
+                        id={`projectDescription-${projectIndex}`}
+                        name={`projectDescription-${projectIndex}`}
                         label="Project Description"
                         placeholder="Describe your project in detail"
                         required={true}
@@ -624,7 +365,7 @@ export default function Page() {
                       {/* Technologies Used Field ✅*/}
                       <Checkbox
                         divWrapperClass={"col-span-2"}
-                        name="technologiesUsed"
+                        name={`technologiesUsed-${projectIndex}`}
                         label="Technologies Used"
                         mapValue={keySkills}
                         required={false}
@@ -633,8 +374,8 @@ export default function Page() {
                       {/* Demo URL Field ✅*/}
                       <TextField
                         divWrapperClass={"flex flex-col mx-auto w-full"}
-                        id="demoUrl"
-                        name="demoUrl"
+                        id={`demoUrl-${projectIndex}`}
+                        name={`demoUrl-${projectIndex}`}
                         label="Live Demo URL"
                         type="url"
                         placeholder="https://yourprojectdemo.com"
@@ -644,8 +385,8 @@ export default function Page() {
                       {/* Repository URL Field ✅*/}
                       <TextField
                         divWrapperClass={"flex flex-col mx-auto w-full"}
-                        id="repositoryUrl"
-                        name="repositoryUrl"
+                        id={`repositoryUrl-${projectIndex}`}
+                        name={`repositoryUrl-${projectIndex}`}
                         label="Repository URL"
                         type="url"
                         placeholder="https://github.com/yourusername/yourproject"
@@ -657,8 +398,8 @@ export default function Page() {
                         divWrapperClass={
                           "col-span-2 flex flex-col mx-auto w-full"
                         }
-                        id="screenshotUrl"
-                        name="screenshotUrl"
+                        id={`screenshotUrl-${projectIndex}`}
+                        name={`screenshotUrl-${projectIndex}`}
                         label="Project Home Page Screenshot URL"
                         type="url"
                         placeholder="https://yourproject.com/screenshot.jpg"
