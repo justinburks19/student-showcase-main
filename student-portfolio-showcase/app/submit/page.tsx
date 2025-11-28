@@ -164,49 +164,56 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
 ]
   
   return (
-    <div className="w-full bg-gradient-to-b from-primary-50 to-white">
-    <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-10 bg-gradient-to-b from-primary-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
+    <div className="h-full container relative mx-auto px-10 sm:px-6 mg:px-8 bg-transparent pt-10">
       {!getStarted && (
-      <m.div className="relative gpu-acceleration py-5 text-center mb-12 pb-4 px-4 border-t-[4px] border-transparent rounded-2xl bg-white shadow-md shadow-black/50"
+      <m.div className=" 
+      relative
+      flex flex-col justify-center items-center  max-w-[min(100vw,700px)]
+      aspect-square
+      overflow-hidden
+      gpu-acceleration text-center mb-4 border-transparent rounded-full bg-white shadow-xl p-[clamp(1rem,2.5vw,3rem)] mx-auto " 
       initial={{ opacity: 0.7, translateY: 0, borderColor:"Transparent"}}
       animate={{ opacity: 1,  translateY: [-20, 0, -15, 0, -10, 0, -5, 0], borderColor:["Transparent", "Black", "Transparent"]}}
-      transition={{duration: 1, repeatType: "mirror", }}
+      transition={{duration: 3, repeatType: "mirror", }}
       >
        
           <m.div className="flex absolute text-[clamp(1rem,2.2vw,3rem)] 
           mx-auto
           inset-0
-          w-[50%]
-          select-none"
+          md:w-[clamp(20%,20%,90%)] w-[clamp(20%,20%,90%)]
+          pointer-events-none"
           
           initial={{ opacity: 0.7, }}
         animate={{ opacity: 1, rotate: 360,fontSize: ["clamp(1rem,2.2vw,3rem)", "clamp(1rem,3.3vw,3rem)"] }}
         transition={{ duration: 3,repeat: Infinity, repeatType: "loop", ease: "linear"}}>🟠
         </m.div>
-        <m.div className="flex absolute text-[clamp(1rem,2.2vw,3rem)] 
+        <m.div className="flex absolute text-[clamp(1rem,2.2vw,3rem)]
           mx-auto
           inset-0
-          w-[40%]
-          select-none"
+          md:w-[clamp(20%,20%,100%)] w-[clamp(20%,20%,100%)]
+          pointer-events-none"
            initial={{ opacity: 0.7, }}
-        animate={{ opacity: 1, rotate: -360, fontSize: ["clamp(1rem,2.2vw,3rem)", "clamp(1rem,1vw,3rem)"] }}
+        animate={{ opacity: 1, rotate: -360, fontSize: ["clamp(1rem,3.3vw,3rem)", "clamp(1rem,2.2vw,3rem)"] }}
         transition={{ duration: 3,repeat: Infinity, repeatType: "loop", ease: "linear"}}>🔵
           </m.div>
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <h1 className="text-[clamp(1.1rem,2.2vw,3rem)] md:text-[clamp(2rem,4vw,5rem)] font-bold text-gray-900 mb-4">
           Submit Your Portfolio
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-[clamp(1rem,2.2vw,1.5rem)] text-gray-600 max-w-2xl mx-auto">
           Share your web development projects with the CSI community by
           submitting your portfolio.
         </p>
+        <button
+          onClick={() => setGetStarted(true)}
+          className="mb-6 mt-6 bg-blue-600 text-white font-medium py-3 px-6 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-black"
+        >
+          Get Started!
+        </button>
       </m.div>
       )}
         
-      <div>
-        <button onClick={() => setGetStarted(true)} className={`mb-6 w-[60%] md:w-[40%] lg:w-[30%] bg-blue-600 text-white font-medium py-3 px-4 rounded-2xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-black mx-auto flex justify-center ${getStarted ? 'hidden' : ''}`}>
-          Get Started!
-        </button>
-      </div>
+
       {/* Formspree integration for handling form submissions */}
       {getStarted && (
         <>
