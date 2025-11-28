@@ -70,7 +70,7 @@ export function CheckBoxExplained({
 
               {isChecked && (
                 <input
-                  type="url"
+                  type="text"
                   id={explanationID}
                   name={`${method}-explanation`}
                   placeholder={`Link it!`}

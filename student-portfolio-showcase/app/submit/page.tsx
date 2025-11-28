@@ -170,8 +170,10 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
           submitting your portfolio.
         </p>
       </div>
-
+        
       {/* Formspree integration for handling form submissions */}
+      {!submit ? (
+        <>
       <div className="max-w-8xl mx-auto bg-white pt-1 rounded-2xl border-l-[3px] border-t-[8px] border-b-[3px] border-r-[3px] border-blue-600">
         <form
           id="portfolioSubmissionForm"
@@ -436,6 +438,15 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
           </FormSection>
         </form>
       </div>
+        </>
+      ) : (
+
+        <div className="mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-2xl text-center">
+          Thank you for your submission! Your portfolio should be ready to download.
+        <p>Please email: Adam.Kostandy@csi.cuny.edu the download/ text field!</p>
+          
+        </div>
+      )}
     </div>
   );
 }
