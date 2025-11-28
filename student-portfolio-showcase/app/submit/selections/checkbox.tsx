@@ -52,7 +52,7 @@ return (
               />
               <label
                 htmlFor={skill}
-                className="text-md font-medium text-gray-700 "
+                className="font-medium text-gray-700 text-sm md:text-md lg:text-lg"
               >
                 {skill}
               </label>
@@ -66,7 +66,7 @@ return (
             id={`${name}-other`}
             name={`${name}-other`}
             placeholder={`Other ${label}`}
-            className={`border-gray-400 text-center w-full border rounded-2xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black border-l-[2px] border-t-[2px] border-r-[2px] border-b-[2px]`}
+            className={`border-gray-400 text-center w-full border rounded-2xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black border-l-[2px] border-t-[2px] border-r-[2px] border-b-[2px] text-sm md:text-md lg:text-lg`}
           />
         </div>
 

@@ -15,13 +15,15 @@
                 <label htmlFor={id} className="block text-sm font-medium text-gray-700 align-center mb-1">
                     <h1 className="text-2xl font-md font-semibold">{label}</h1>
                 </label>
+
                 <select
                     id={id}
                     name={name}
                     required={required}
-                    className={className}
+                    className={className + " text-sm md:text-md lg:text-lg"}
+                    defaultValue=""
                 >
-                    <option value="" disabled selected>Select your graduation year</option>
+                    <option value=""> Select your graduation year</option>
                     {years.map((year) => (
                         <option key={year} value={year}>{year}</option>
                     ))}

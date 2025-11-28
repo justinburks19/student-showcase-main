@@ -29,7 +29,7 @@
                     id={id}
                     name={name}
                     required={required}
-                    className={className}
+                    className={className + " text-sm md:text-md lg:text-lg"}
                 >
                     <option value="" disabled selected>Select semester</option>
                     {semesterYearOptions.map((option) => (

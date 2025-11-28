@@ -47,7 +47,7 @@
               rows={rows}
               placeholder={placeholder}
               required={required}
-              className={className}
+              className={className + " text-sm md:text-md lg:text-lg"}
             />
           ) : (
             <input
@@ -56,7 +56,7 @@
               type={type}
               placeholder={placeholder}
               required={required}
-              className={className}
+              className={className + " text-xs md:text-md lg:text-lg "}
             />
           )}
         </div>

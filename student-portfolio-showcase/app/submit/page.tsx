@@ -7,9 +7,13 @@ import {Checkbox} from "./selections/checkbox"; // Import the reusable Checkbox 
 import {YearDropdown} from "./selections/yearsDrop"; // Import the reusable YearDropdown component
 import {SemesterDropdown} from "./selections/semesterDrop"; // Import the reusable SemesterDropdown component
 import {CheckBoxExplained} from "./selections/checkBoxExplained"; // Import the reusable CheckBoxExplained component
+import { motion as m} from "framer-motion";
+import { size } from "zod/v4";
+import { get } from "http";
 export default function Page() {
   const [submit, setSubmit] = useState(false); // State to track form submission
   const [addProject, setAddProject] = useState(1); // State to track number of projects added
+  const [getStarted, setGetStarted] = useState(false); // State to track if user has started filling the form
   // List of key skills for checkbox options
   const keySkills = [
     "HTML",
@@ -51,10 +55,9 @@ export default function Page() {
   keySkills.sort(); // Sort keySkills in alphabetical order
   majorOptions.sort(); // Sort majorOptions in alphabetical order
 
-  const basicInfo = `py-1 border border-black rounded-2xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black border-l-[2px] border-t-[2px] border-r-[3px] border-b-[4px] w-[80%] md:w-[60%] mx-auto text-center text-[clamp(14px,1.5vw,18px)]`;
+  const basicInfo = `py-1 border border-black rounded-2xl px-3 py-2 focus:outline-none border-l-[2px] border-t-[2px] border-r-[3px] border-b-[4px] w-[80%] md:w-[60%] mx-auto text-center text-[clamp(14px,1.5vw,18px)]`;
   const projectInfo =
-    "py-1 border border-black rounded-2xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black border-l-[2px] border-t-[2px] border-r-[3px] border-b-[4px] w-[90%] md:w-[50%] mx-auto text-center text-[clamp(14px,1.5vw,18px)]";
-
+    "py-1 border border-black rounded-2xl px-3 py-2 focus:outline-none border-l-[2px] border-t-[2px] border-r-[3px] border-b-[4px] w-[90%] md:w-[50%] mx-auto text-center text-[clamp(14px,1.5vw,18px)]";
   //Handle Another project addition
   const handleAddProject = () => {
     //validation for new entry
@@ -76,9 +79,10 @@ export default function Page() {
     // Check if all required fields are filled
     for (const id of requiredIds) {
         const element = document.getElementById(id) as 
-        | HTMLInputElement
-        | HTMLTextAreaElement
-        | null;
+        | HTMLInputElement // for text and url inputs
+        | HTMLTextAreaElement // for textarea inputs
+        | HTMLSelectElement // for select dropdowns
+        
         if (!element) continue; // Skip if element not found
 
         // Additional validation for URL fields
@@ -160,8 +164,34 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
 ]
   
   return (
-    <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-5">
-      <div className="text-center mb-12">
+    <div className="w-full bg-gradient-to-b from-primary-50 to-white">
+    <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-10 bg-gradient-to-b from-primary-50 to-white">
+      {!getStarted && (
+      <m.div className="relative gpu-acceleration py-5 text-center mb-12 pb-4 px-4 border-t-[4px] border-transparent rounded-2xl bg-white shadow-md shadow-black/50"
+      initial={{ opacity: 0.7, translateY: 0, borderColor:"Transparent"}}
+      animate={{ opacity: 1,  translateY: [-20, 0, -15, 0, -10, 0, -5, 0], borderColor:["Transparent", "Black", "Transparent"]}}
+      transition={{duration: 1, repeatType: "mirror", }}
+      >
+       
+          <m.div className="flex absolute text-[clamp(1rem,2.2vw,3rem)] 
+          mx-auto
+          inset-0
+          w-[50%]
+          select-none"
+          
+          initial={{ opacity: 0.7, }}
+        animate={{ opacity: 1, rotate: 360,fontSize: ["clamp(1rem,2.2vw,3rem)", "clamp(1rem,3.3vw,3rem)"] }}
+        transition={{ duration: 3,repeat: Infinity, repeatType: "loop", ease: "linear"}}>🟠
+        </m.div>
+        <m.div className="flex absolute text-[clamp(1rem,2.2vw,3rem)] 
+          mx-auto
+          inset-0
+          w-[40%]
+          select-none"
+           initial={{ opacity: 0.7, }}
+        animate={{ opacity: 1, rotate: -360, fontSize: ["clamp(1rem,2.2vw,3rem)", "clamp(1rem,1vw,3rem)"] }}
+        transition={{ duration: 3,repeat: Infinity, repeatType: "loop", ease: "linear"}}>🔵
+          </m.div>
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Submit Your Portfolio
         </h1>
@@ -169,9 +199,17 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
           Share your web development projects with the CSI community by
           submitting your portfolio.
         </p>
-      </div>
+      </m.div>
+      )}
         
+      <div>
+        <button onClick={() => setGetStarted(true)} className={`mb-6 w-[60%] md:w-[40%] lg:w-[30%] bg-blue-600 text-white font-medium py-3 px-4 rounded-2xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-black mx-auto flex justify-center ${getStarted ? 'hidden' : ''}`}>
+          Get Started!
+        </button>
+      </div>
       {/* Formspree integration for handling form submissions */}
+      {getStarted && (
+        <>
       {!submit ? (
         <>
       <div className="max-w-8xl mx-auto bg-white pt-1 rounded-2xl border-l-[3px] border-t-[8px] border-b-[3px] border-r-[3px] border-blue-600">
@@ -447,6 +485,11 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
           
         </div>
       )}
+        </>
+    )}
     </div>
+      
+    </div>
+      
   );
 }
