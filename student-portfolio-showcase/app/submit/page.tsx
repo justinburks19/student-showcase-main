@@ -7,7 +7,7 @@ import {Checkbox} from "./selections/checkbox"; // Import the reusable Checkbox 
 import {YearDropdown} from "./selections/yearsDrop"; // Import the reusable YearDropdown component
 import {SemesterDropdown} from "./selections/semesterDrop"; // Import the reusable SemesterDropdown component
 import {CheckBoxExplained} from "./selections/checkBoxExplained"; // Import the reusable CheckBoxExplained component
-import { motion as m} from "framer-motion";
+import { motion as m, AnimatePresence} from "framer-motion";
 import { size } from "zod/v4";
 import { get } from "http";
 export default function Page() {
@@ -164,10 +164,13 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
 ]
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
+    <div className="relative min-h-screen bg-gradient-to-b from-primary-50 to-white">
     <div className="h-full container relative mx-auto px-10 sm:px-6 mg:px-8 bg-transparent pt-10">
+      <AnimatePresence mode="wait">
       {!getStarted && (
-      <m.div className=" 
+      <m.div 
+      key = "portfolio-circle"
+      className=" 
       relative
       flex flex-col justify-center items-center  max-w-[min(100vw,700px)]
       aspect-square
@@ -175,7 +178,16 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
       gpu-acceleration text-center mb-4 border-transparent rounded-full bg-white shadow-xl p-[clamp(1rem,2.5vw,3rem)] mx-auto " 
       initial={{ opacity: 0.7, translateY: 0, borderColor:"Transparent"}}
       animate={{ opacity: 1,  translateY: [-20, 0, -15, 0, -10, 0, -5, 0], borderColor:["Transparent", "Black", "Transparent"]}}
-      transition={{duration: 3, repeatType: "mirror", }}
+      transition={{duration: 3, repeatType: "mirror", 
+      
+      }}
+      exit={{
+        opacity: 0,
+        scale:0.8,
+        rotateY: [0,270,360,180,270,360],
+        transition: { duration: 3, ease: "easeInOut" }
+      }}
+      style={{ borderWidth: 2, borderStyle: "solid", borderColor: "transparent", transformStyle: "preserve-3d" }}
       >
        
           <m.div className="flex absolute text-[clamp(1rem,2.2vw,3rem)] 
@@ -212,6 +224,7 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
         </button>
       </m.div>
       )}
+      </AnimatePresence>
         
 
       {/* Formspree integration for handling form submissions */}
@@ -219,7 +232,10 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
         <>
       {!submit ? (
         <>
-      <div className="max-w-8xl mx-auto bg-white pt-1 rounded-2xl border-l-[3px] border-t-[8px] border-b-[3px] border-r-[3px] border-blue-600">
+      <m.div className=" max-w-8xl mx-auto bg-white pt-1 rounded-2xl border-l-[3px] border-t-[8px] border-b-[3px] border-r-[3px] border-blue-600"
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 1.3, delay: 3 }}>
         <form
           id="portfolioSubmissionForm"
           onSubmit={handlesubmit}
@@ -482,7 +498,7 @@ const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
             </div>
           </FormSection>
         </form>
-      </div>
+      </m.div>
         </>
       ) : (
 
