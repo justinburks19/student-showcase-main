@@ -211,46 +211,46 @@ export default function Page() {
             >
               {/* Animated circles */}
               <m.div
-                className="flex absolute text-[clamp(1rem,2.2vw,3rem)] 
+                className="flex absolute text-[clamp(1.3rem,2.8vw,3rem)] 
           mx-auto
           inset-0
           md:w-[clamp(20%,20%,90%)] w-[clamp(20%,20%,90%)]
-          pointer-events-none"
-                initial={{ opacity: 0.7 }}
+          pointer-events-none
+          justify-center
+          brightness-125
+          "
+                initial={{ opacity: 1,x:0 }}
                 animate={{
-                  opacity: 1,
+                  opacity: [0,7, 1, 0.7, 1, 0],
                   rotate: 360,
-                  fontSize: [
-                    "clamp(1rem,2.2vw,3rem)",
-                    "clamp(1rem,3.3vw,3rem)",
-                  ],
+                  
                 }}
                 transition={{
-                  duration: 3,
+                  duration: 2,
                   repeat: Infinity,
                   repeatType: "loop",
                   ease: "linear",
                 }}
+                
               >
                 🟠
               </m.div>
               <m.div
-                className="flex absolute text-[clamp(1rem,2.2vw,3rem)]
+                className="flex absolute text-[clamp(1.3rem,2.8vw,3rem)]
           mx-auto
           inset-0
           md:w-[clamp(20%,20%,100%)] w-[clamp(20%,20%,100%)]
-          pointer-events-none"
-                initial={{ opacity: 0.7 }}
+          pointer-events-none
+          justify-center
+          brightness-125"
+                initial={{ opacity: 1,x:0, y:50 }}
                 animate={{
-                  opacity: [0.5, 0.8, 1],
+                  opacity: [0,7, 1, 0.7, 1, 0],
                   rotate: -360,
-                  fontSize: [
-                    "clamp(1rem,3.3vw,3rem)",
-                    "clamp(1rem,2.2vw,3rem)",
-                  ],
+                  y: [50, 0, -100, 0, 30, 50],
                 }}
                 transition={{
-                  duration: 3,
+                  duration: 2,
                   repeat: Infinity,
                   repeatType: "loop",
                   ease: "linear",
