@@ -10,6 +10,8 @@ import { CheckBoxExplained } from "./selections/checkBoxExplained"; // Import th
 import { motion as m, AnimatePresence } from "framer-motion";
 import { ThreeDText } from "./customizer-section/threeD-Text-h1";
 import { ScrollIntoView } from "./customizer-section/scroll-Into-View";
+//import { LiveDownload } from "./liveDownload"; <--- Would need help fixing this component
+
 
 export default function Page() {
   const [submit, setSubmit] = useState(false); // State to track form submission
@@ -122,6 +124,7 @@ export default function Page() {
       "skills",
       "contactMethods",
       "technologiesUsed-1",
+      
     ];
 
     multiValueFields.forEach((value) => {
@@ -682,8 +685,10 @@ export default function Page() {
                       
                     </FormSection>
                   </form>
+                  
                 </m.div>
-                 
+                 {/* Live goes here */}
+                 {/*<LiveDownload mapValue={handleAddProject.requiredIds}  /> */}
               </>
             ) : (
               <div className="mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-2xl text-center">
