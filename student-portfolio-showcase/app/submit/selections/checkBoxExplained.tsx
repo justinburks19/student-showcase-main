@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { motion as m } from "framer-motion";
 // Reusable checkbox with a label
 type CheckBoxExplainedProps = {
   name: string;
@@ -56,17 +56,20 @@ export function CheckBoxExplained({
                 id={id}
                 name={name}
                 value={method}
-                className="mr-1"
+                className="mr-1 h-4"
                 required={required && !check} // ✅ “at least one” logic
                 onChange={handleChange(method)}
                 checked={isChecked}
               />
-              <label
+              <m.label
+                  initial={{ color: "#000000ff" }}
+                  whileHover={{ color: ["#ff0000ff", "rgba(255,165,0,1)", "rgba(255,255,0,1)", "rgba(0,128,0,1)", "rgba(0,0,255,1)", "rgba(75,0,130,1)", "rgba(238,130,238,1)"] }}
+                  transition={{repeat: Infinity, repeatType: "mirror"}}
                 htmlFor={id}
                 className="text-md font-medium text-gray-700 "
               >
                 {method}
-              </label>
+              </m.label>
 
               {isChecked && (
                 <input

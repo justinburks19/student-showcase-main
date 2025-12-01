@@ -18,7 +18,7 @@ export function ScrollIntoView({
 }: ScrollIntoViewProps) {
   const ref = useRef<HTMLElement | null>(null); // useRef is for DOM access
   const scrollDirection = useScrollDirection(); // custom hook to get scroll direction
-  const inView = useInView(ref, { amount: scrollDirection === "up" ? 0.5 : 0.5 }); // re-triggers when in/out of view, use in view is for checking visibility
+  const inView = useInView(ref, { amount: scrollDirection === "up" ? 0.1 : 0.1 }); // re-triggers when in/out of view, use in view is for checking visibility
 
   // starting offset based on direction
   const offsets: Record<BaseDirection, { x?: number; y?: number }> = { //record is like an object but with specific keys
@@ -45,7 +45,7 @@ export function ScrollIntoView({
           ? { opacity: 1, x: 0, y: 0, }        // when visible
           : { opacity: 0, ...start }         // when not visible (reset)
       }
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
     >
       {children}
     </m.section>

@@ -1,3 +1,4 @@
+import {motion as m} from "framer-motion";
 // Checkbox component to render a list of checkboxes
 import {useState} from "react"
 type CheckboxProps = {
@@ -19,7 +20,7 @@ type CheckboxProps = {
     const [check, setCheck] = useState(false);
     
     const handleChange = () => {
-      
+
       const selectedItems = mapValue.filter((skill) => document.getElementById(skill) instanceof HTMLInputElement 
       && (document.getElementById(skill) as HTMLInputElement).checked); // Get selected checkboxes
       
@@ -29,6 +30,8 @@ type CheckboxProps = {
       setCheck(false);
       // Event handler for checkbox change
     }
+    
+    
 return (
   
       <div className={divWrapperClass}>
@@ -44,20 +47,24 @@ return (
           {mapValue.map((skill: string, index: number) => (
             <div key={index} className="flex flex-wrap mx-auto mb-1">
               <input
+
                 type="checkbox"
                 id={skill}
                 name={name}
                 value={skill}
-                className='mr-1'
+                className='mr-1 w-4'
                 required={required && !check} // check 
                 onChange={handleChange}
               />
-              <label
+              <m.label
+              initial={{ color: "#000000ff" }}
+              whileHover={{ color: ["#ff0000ff", "rgba(255,165,0,1)", "rgba(255,255,0,1)", "rgba(0,128,0,1)", "rgba(0,0,255,1)", "rgba(75,0,130,1)", "rgba(238,130,238,1)"] }}
+              transition={{repeat: Infinity, repeatType: "mirror"}}
                 htmlFor={skill}
-                className="font-medium text-gray-700 text-sm md:text-md lg:text-lg"
+                className="font-medium text-sm md:text-md lg:text-lg "
               >
                 {skill}
-              </label>
+              </m.label>
             </div>
           ))}
 

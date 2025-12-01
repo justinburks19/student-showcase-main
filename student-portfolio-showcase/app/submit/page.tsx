@@ -68,6 +68,7 @@ export default function Page() {
 
     //validation fields
     const requiredIds = [
+      'fullName',
       `projectName-${index}`, // Updated to use dynamic index
       `projectDescription-${index}`,
       `technologiesUsed-${index}`,
@@ -101,65 +102,206 @@ export default function Page() {
   };
 
   // Handle what information saves and downloads as JSON file
-  const handlesubmit = (event: React.FormEvent<HTMLFormElement>) => {
+const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // STOP FORM FROM REFRESHING
 
-    if (submit) return; // Prevent multiple submissions
+    // PREVENT DOUBLE SUBMISSIONS (user spamming the button)
+    if (submit) return;
     setSubmit(true); // Mark as submitted
 
-    const form = event.currentTarget; // Get the form element
-    const formData = new FormData(form); // Create FormData object from the form
+    const form = event.currentTarget;
+    const formData = new FormData(form);
 
-    const data: { [key: string]: string | File } = {};
+    // ---------------------------------------------
+    // HELPER: GET SINGLE STRING FIELD
+    // - Safely reads from FormData
+    // - Returns "" if the field is missing or empty
+    // ---------------------------------------------
+    const getString = (name: string): string =>
+      (formData.get(name)?.toString().trim()) || "";
 
-    // Grab basic fields (will get the *last* value for repeated names)
-    formData.forEach((value, key) => {
-      data[key] = value;
-    });
+    // ---------------------------------------------
+    // HELPER: GET ARRAY FROM MULTI-VALUE FIELD
+    // - Used for checkbox groups like "skills" or "technologiesUsed-1"
+    // - Uses getAll so every checked value is included
+    // ---------------------------------------------
+    const getCsvArray = (name: string): string[] =>
+      formData
+        .getAll(name)
+        .map((v) => v.toString().trim())
+        .filter(Boolean);
 
-    // ----- FIX FOR CHECKBOX GROUPS -----
-    // Collect ALL checked values for these fields:
-    const multiValueFields = [
-      "major",
-      "skills",
-      "contactMethods",
-      "technologiesUsed-1",
-      
-    ];
+    // ---------------------------------------------
+    // HELPER: SLUGIFY
+    // - Turns a string like "Card Simulation Game!"
+    //   into "card-simulation-game"
+    // - Used for stable IDs
+    // ---------------------------------------------
+    const slugify = (value: string): string =>
+      value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric characters with hyphens
+        .replace(/(^-|-$)+/g, ""); // Remove leading and trailing hyphens
 
-    multiValueFields.forEach((value) => {
-      const values = formData
-        .getAll(value) // all values for that name
-        .map((v) => v.toString().trim()) // to string and trim whitespace
-        .filter(Boolean); // drop empties
+    // ---------------------------------------------
+    // HELPER: DATE -> ISO STRING
+    // - Takes "YYYY-MM-DD" and returns "YYYY-MM-DDT00:00:00Z"
+    // - Matches the format used in the Alan example JSON
+    // ---------------------------------------------
+    const toIsoDate = (d: string): string => (d ? `${d}T00:00:00Z` : "");
 
-      if (values.length > 0) {
-        // store as comma-separated string
-        data[value] = values.join(", ");
-      } else {
-        data[value] = "";
+    // ============================================================
+    // 1) BUILD TOP-LEVEL STUDENT FIELDS
+    // ============================================================
+
+    // FULL NAME -> firstName + lastName
+    const fullName = getString("fullName");
+    const [firstNameRaw, ...restName] = fullName.split(" ");
+    const firstName = firstNameRaw || "";
+    const lastName = restName.join(" ");
+
+    // GENERATE ID (e.g., "justin-burks")
+    const generatedId = slugify(fullName || "student");
+    
+
+    // ============================================================
+    // 2) BUILD SEMESTERS + PROJECTS (FOR *ALL* PROJECT SLOTS)
+    // ============================================================
+
+    // Types for clarity (not required, but nice for TS/hover info)
+    type Project = {
+      id: string;
+      title: string;
+      description: string;
+      technologies: string[];
+      featured: boolean;
+      demoUrl: string;
+      repoUrl: string;
+      screenshot: string;
+      semester: string;
+      completedDate: string;
+      canEmbed: boolean;
+    };
+
+    type Semester = {
+      name: string;
+      startDate: string;
+      endDate: string;
+      projects: Project[];
+    };
+
+    // We use a map so multiple projects in the SAME semester get grouped together
+    const semesterMap: Record<string, Semester> = {};
+
+    // LOOP THROUGH EACH PROJECT INDEX FROM 1..addProject
+    for (let i = 1; i <= addProject; i++) {
+      const semesterName = getString(`semester-${i}`);
+      const startDateRaw = getString(`startDate-${i}`);
+      const endDateRaw = getString(`endDate-${i}`);
+      const projectTitle = getString(`projectName-${i}`);
+
+      // Build a stable project ID from the title
+      const projectId = slugify(projectTitle);
+
+      // shape the project object
+      const project: Project = {
+        id: projectId,
+        title: projectTitle,
+        description: getString(`projectDescription-${i}`),
+        technologies: getCsvArray(`technologiesUsed-${i}`), // all checked tech values
+        featured: false,
+        demoUrl: getString(`demoUrl-${i}`),
+        repoUrl: getString(`repositoryUrl-${i}`),
+        screenshot: getString(`screenshotUrl-${i}`),
+        semester: semesterName,
+        completedDate: toIsoDate(endDateRaw), // we use end date as "completed" date
+        canEmbed: false, 
+      };
+
+      // If this semester isn't in the map yet, initialize it
+      if (!semesterMap[semesterName]) {
+        semesterMap[semesterName] = {
+          name: semesterName,
+          startDate: toIsoDate(startDateRaw),
+          endDate: toIsoDate(endDateRaw),
+          projects: [],
+        };
       }
-    });
-    // -----------------------------------
 
-    const jsonData = JSON.stringify(data, null, 2); // Convert form data to JSON string with indentation
+      // Add this project to the semester’s project list
+      semesterMap[semesterName].projects.push(project);
+    }
 
-    const downloadJson = formData.get("downloadJson");
+    // Convert semesterMap -> array for final JSON
+    const semesters: Semester[] = Object.values(semesterMap);
 
-    if (downloadJson) {
+    // ============================================================
+    // 3) BUILD FINAL PORTFOLIO OBJECT
+    // ============================================================
+    const portfolio = {
+      // e.g., "justin-burks"
+      id: generatedId,
+
+      // Split out of fullName
+      firstName,
+      lastName,
+
+      // Top-level contact fields
+      email: getString("email"),
+      photo: getString("headshotUrl"),
+
+      // About the student
+      bio: getString("bio"),
+      personalStatement: getString("personalStatement"),
+      major: getString("major"),
+      graduationYear: Number(getString("graduationYear") || 0),
+
+      // Nested contact object (like in Alan’s JSON)
+      contact: {
+        contactMethods: getCsvArray("contactMethods"),
+      },
+
+      // Skills array (comes from checkbox group named "skills")
+      skills: getCsvArray("skills"),
+
+      // Career goals text
+      careerGoals: getString("careerGoals"),
+
+      // Semesters array we built above, each with its own projects array
+      semesters,
+    };
+
+    // ============================================================
+    // 4) STRINGIFY + TRIGGER DOWNLOAD (IF REQUESTED)
+    // ============================================================
+
+    // See exactly what sending / downloading in the console
+    console.log("PORTFOLIO OBJECT:", portfolio);
+
+    const jsonData = JSON.stringify(portfolio, null, 2);
+    console.log("JSON STRING:", jsonData);
+
+    // Hidden input <input type="hidden" name="downloadJson" value="true" />
+    const wantsDownload = !!formData.get("downloadJson");
+
+    if (wantsDownload) {
       const blob = new Blob([jsonData], { type: "application/json" });
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
-      a.download = "portfolio_submission.json";
+      // File name will be something like "justin-burks.json"
+      a.download = `${portfolio.id || "portfolio_submission"}.json`;
       a.click();
 
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url); // Clean up blob URL
     }
-
-    console.log("Form submitted:", data);
   };
+
+
+
+
 
   // Contact methods options
   const contactMethods = [
@@ -197,14 +339,14 @@ export default function Page() {
                 borderColor: ["Transparent", "Black", "Transparent"],
               }}
               transition={{
-                duration: 3,
+                duration: .5,
                 repeatType: "mirror",
               }}
               exit={{
                 opacity: 0,
                 scale: 0.8,
                 rotateY: [0, 270, 360, 180, 270, 360],
-                transition: { duration: 3, ease: "easeInOut" },
+                transition: { duration: 1, ease: "easeInOut" },
               }}
               style={{
                 borderWidth: 2,
@@ -340,11 +482,9 @@ export default function Page() {
               <>
               {/* Form Section wrapper */}
                 <m.div 
-                  className="max-h-[75vh]
+                  className="
                   max-w-[100%]
                   overflow-y-auto
-                  scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200
-
                   bg-white/95
                   pt-3
                   rounded-2xl
@@ -354,11 +494,11 @@ export default function Page() {
                   "
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 1.3, delay: 3 }}
+                  transition={{ duration: 1.1, delay: 1.1, ease: "easeOut" }}
                 >
                   <form
                     id="portfolioSubmissionForm"
-                    onSubmit={handlesubmit}
+                    onSubmit={handleSubmit}
                     className="space-y-6"
                   >
                     <input type="hidden" name="downloadJson" value="true" />
@@ -694,10 +834,6 @@ export default function Page() {
               <div className="mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-2xl text-center">
                 Thank you for your submission! Your portfolio should be ready to
                 download.
-                <p>
-                  Please email: Adam.Kostandy@csi.cuny.edu the download/ text
-                  field!
-                </p>
               </div>
             )}
           </>
