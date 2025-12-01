@@ -14,7 +14,7 @@ type ScrollIntoViewProps = {
 export function ScrollIntoView({
   children,
   className = "",
-  direction = "up", // default
+  direction = "autoY", // default, was up, needs to adapt based on scroll
 }: ScrollIntoViewProps) {
   const ref = useRef<HTMLElement | null>(null); // useRef is for DOM access
   const scrollDirection = useScrollDirection(); // custom hook to get scroll direction
