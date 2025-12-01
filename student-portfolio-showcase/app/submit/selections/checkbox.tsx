@@ -17,10 +17,12 @@ type CheckboxProps = {
     required = false,
   }: CheckboxProps) {
     const [check, setCheck] = useState(false);
+    
     const handleChange = () => {
+      
       const selectedItems = mapValue.filter((skill) => document.getElementById(skill) instanceof HTMLInputElement 
       && (document.getElementById(skill) as HTMLInputElement).checked); // Get selected checkboxes
-
+      
       if (selectedItems.length > 0)
       setCheck(true);
       else 
@@ -46,7 +48,7 @@ return (
                 id={skill}
                 name={name}
                 value={skill}
-                className="mr-1"
+                className='mr-1'
                 required={required && !check} // check 
                 onChange={handleChange}
               />

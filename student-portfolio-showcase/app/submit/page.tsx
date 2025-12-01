@@ -9,6 +9,7 @@ import { SemesterDropdown } from "./selections/semesterDrop"; // Import the reus
 import { CheckBoxExplained } from "./selections/checkBoxExplained"; // Import the reusable CheckBoxExplained component
 import { motion as m, AnimatePresence } from "framer-motion";
 import { ThreeDText } from "./customizer-section/threeD-Text-h1";
+import { ScrollIntoView } from "./customizer-section/scroll-Into-View";
 
 export default function Page() {
   const [submit, setSubmit] = useState(false); // State to track form submission
@@ -221,7 +222,7 @@ export default function Page() {
           "
                 initial={{ opacity: 1,x:0 }}
                 animate={{
-                  opacity: [0,7, 1, 0.7, 1, 0],
+                  
                   rotate: 360,
                   
                 }}
@@ -245,7 +246,7 @@ export default function Page() {
           brightness-125"
                 initial={{ opacity: 1,x:0, y:50 }}
                 animate={{
-                  opacity: [0,7, 1, 0.7, 1, 0],
+                  
                   rotate: -360,
                   y: [50, 0, -100, 0, 30, 50],
                 }}
@@ -262,7 +263,7 @@ export default function Page() {
               {/* 3D Text Component for the heading */}
               <ThreeDText
                 text="Share Your Portfolio"
-                textSize="text-[clamp(2.1rem,3.7vw,4rem)] sm:text-[clamp(3.2rem,3.9vw,4rem)] md:text-[clamp(3rem,3.2vw,3.3rem)] font-semibold text-gray-900 justify-self-center align-end"
+                textSize="text-[clamp(2.1rem,3.7vw,4rem)] sm:text-[clamp(3.2rem,3.9vw,4rem)] md:text-[clamp(3rem,3.2vw,3.3rem)] font-semibold text-black justify-self-center align-end"
               />
               </div>
               {/* Subtitle*/}
@@ -272,8 +273,8 @@ export default function Page() {
               w-[110%]
               -mx-[5%]
               [clip-path:ellipse(80%_40%_at_50%_50%)]
-              p-[2px]
-              border-4 border-black
+              p-[4px]
+              
               ">
                 <div
     className="
@@ -284,7 +285,7 @@ export default function Page() {
     "
   >
                 
-              <p className="text-[clamp(1.0rem,2.2vw,1.5rem)] text-gray-600 max-w-2xl mx-auto
+              <p className="text-[clamp(1.0rem,2.2vw,1.5rem)] text-black font-semibold max-w-2xl mx-auto
               align-bottom
               justify-center
               
@@ -326,13 +327,28 @@ export default function Page() {
           )}
         </AnimatePresence>
 
+        
         {/* Formspree integration for handling form submissions */}
         {getStarted && (
           <>
+            {getStarted && (
+          <>
             {!submit ? (
               <>
-                <m.div
-                  className=" max-w-8xl mx-auto bg-white pt-1 rounded-2xl border-l-[3px] border-t-[8px] border-b-[3px] border-r-[3px] border-blue-600"
+              {/* Form Section wrapper */}
+                <m.div 
+                  className="max-h-[75vh]
+                  max-w-[100%]
+                  overflow-y-auto
+                  scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200
+
+                  bg-white/95
+                  pt-3
+                  rounded-2xl
+                  border-l-[3px] border-t-[8px] border-b-[3px] border-r-[3px] border-blue-600
+                  shadow-[0_18px_45px_rgba(15,23,250,0.45)]
+                  overflow-x-hidden 
+                  "
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 1.3, delay: 3 }}
@@ -343,6 +359,7 @@ export default function Page() {
                     className="space-y-6"
                   >
                     <input type="hidden" name="downloadJson" value="true" />
+                    
                     <FormSection
                       title="Basic Information"
                       subtitle="Tell us about yourself"
@@ -351,6 +368,7 @@ export default function Page() {
                       <div className="text-center ">
                         {/* Full Name Field ✅*/}
                         <div className="grid grid-cols-2">
+                          <ScrollIntoView direction="left">
                           <TextField
                             id="fullName"
                             name="fullName"
@@ -359,8 +377,11 @@ export default function Page() {
                             required={true}
                             className={basicInfo}
                           />
+                          </ScrollIntoView>
+                          
 
                           {/* Email Address Field✅ */}
+                          <ScrollIntoView direction="right">
                           <TextField
                             id="email"
                             name="email"
@@ -370,9 +391,11 @@ export default function Page() {
                             required={true}
                             className={basicInfo}
                           />
+                          </ScrollIntoView>
                         </div>
 
                         {/* Optional URL link of portfolio headedshot needed ✅ */}
+                        <ScrollIntoView>
                         <TextField
                           id="headshotUrl"
                           name="headshotUrl"
@@ -382,8 +405,10 @@ export default function Page() {
                           required={false}
                           className={basicInfo}
                         />
+                        </ScrollIntoView>
 
                         {/* Bio Field ✅*/}
+                        <ScrollIntoView>
                         <TextField
                           id="bio"
                           name="bio"
@@ -394,8 +419,9 @@ export default function Page() {
                           className={basicInfo}
                           rows={4}
                         />
-
+                        </ScrollIntoView>
                         {/* Personal Statement ✅*/}
+                        <ScrollIntoView>
                         <TextField
                           id="personalStatement"
                           name="personalStatement"
@@ -406,16 +432,20 @@ export default function Page() {
                           rows={4}
                           className={basicInfo}
                         />
+                        </ScrollIntoView>
 
                         {/*Major/Field of Study ✅ */}
+                        <ScrollIntoView>
                         <Checkbox
                           name="major"
                           label="Major / Field of Study"
                           mapValue={majorOptions}
                           required={true}
                         />
+                        </ScrollIntoView>
 
                         {/* Graduation Year ✅*/}
+                        <ScrollIntoView>
                         <YearDropdown
                           id="graduationYear"
                           name="graduationYear"
@@ -423,24 +453,30 @@ export default function Page() {
                           required={true}
                           className={basicInfo}
                         />
+                        </ScrollIntoView>
 
                         {/* Contact options ✅*/}
+                        <ScrollIntoView>
                         <CheckBoxExplained
                           name="contactMethods"
                           label="Preferred Contact Methods"
                           mapValue={contactMethods}
                           required={true}
                         />
+                        </ScrollIntoView>
 
                         {/* skills selction ✅*/}
+                        <ScrollIntoView>
                         <Checkbox
                           name="skills"
                           label="Key Skills"
                           mapValue={keySkills}
                           required={false}
                         />
+                        </ScrollIntoView>
 
                         {/* Career Goals ✅*/}
+                        <ScrollIntoView>
                         <TextField
                           id="careerGoals"
                           name="careerGoals"
@@ -451,31 +487,38 @@ export default function Page() {
                           rows={4}
                           className={basicInfo}
                         />
+                        </ScrollIntoView>
 
+                      <ScrollIntoView direction="left">
                         <h2 className="text-4xl font-bold text-black mb-6 text-center border-t-[6px] border-blue-700 rounded-xl pt-2 italic">
                           Project Semester Info
                         </h2>
+                        </ScrollIntoView>
                         {/* Semesters History, will return id, title, description and technologies ✅*/}
                         <div className="grid grid-cols-2 w-full ">
                           {Array.from({ length: addProject }).map(
-                            (_, index) => {
+                            (_,index) => {  //index will be _ unknown value to ignore
                               const projectIndex = index + 1;
                               return (
                                 <React.Fragment key={projectIndex}>
                                   {/* Semester Name Field ✅*/}
+                                  <div className="col-span-2">
+                                  <ScrollIntoView>
                                   <SemesterDropdown
-                                    divClassWrapper={"col-span-2"}
                                     id={`semester-${projectIndex}`}
                                     name={`semester-${projectIndex}`}
                                     label={`Project ${projectIndex}`}
                                     required={true}
                                     className={basicInfo}
                                   />
+                                  </ScrollIntoView>
+                                  </div>
+
                                   {/*Start date Field ✅*/}
+                                  <div className="flex flex-col mx-auto w-full">
+                                  <ScrollIntoView>
                                   <TextField
-                                    divWrapperClass={
-                                      "flex flex-col mx-auto w-full"
-                                    }
+                                    
                                     id={`startDate-${projectIndex}`}
                                     name={`startDate-${projectIndex}`}
                                     label="Project Start Date"
@@ -486,11 +529,13 @@ export default function Page() {
                                       " flex flex-col justify-center"
                                     }
                                   />
+                                  </ScrollIntoView>
+                                  </div>
+                                  
                                   {/* End Date Field ✅*/}
+                                  <div className="flex flex-col mx-auto w-full">
+                                  <ScrollIntoView>
                                   <TextField
-                                    divWrapperClass={
-                                      "flex flex-col mx-auto w-full"
-                                    }
                                     id={`endDate-${projectIndex}`}
                                     name={`endDate-${projectIndex}`}
                                     label="Project End Date"
@@ -501,12 +546,14 @@ export default function Page() {
                                       " flex flex-col justify-center"
                                     }
                                   />
+                                  </ScrollIntoView>
+                                  </div>
 
                                   {/* Project Name Field ✅*/}
+                                  <div className="col-span-2 flex flex-col mx-auto w-full">
+                                  <ScrollIntoView>
                                   <TextField
-                                    divWrapperClass={
-                                      "col-span-2 flex flex-col mx-auto w-full"
-                                    }
+                                    
                                     id={`projectName-${projectIndex}`}
                                     name={`projectName-${projectIndex}`}
                                     label="Project Name"
@@ -517,11 +564,14 @@ export default function Page() {
                                       " col-span-2 flex flex-col mx-auto"
                                     }
                                   />
+                                  </ScrollIntoView>
+                                  </div>
+                                  
                                   {/* Project Description Field ✅*/}
+                                  <div className="col-span-2 flex flex-col mx-auto w-full">
+                                  <ScrollIntoView>
                                   <TextField
-                                    divWrapperClass={
-                                      "col-span-2 flex flex-col mx-auto w-full"
-                                    }
+                                    
                                     id={`projectDescription-${projectIndex}`}
                                     name={`projectDescription-${projectIndex}`}
                                     label="Project Description"
@@ -534,20 +584,27 @@ export default function Page() {
                                       " col-span-2 flex flex-col mx-auto"
                                     }
                                   />
+                                  </ScrollIntoView>
+                                  </div>
 
                                   {/* Technologies Used Field ✅*/}
+
+                                  <div className="col-span-2">
+                                  <ScrollIntoView>
                                   <Checkbox
-                                    divWrapperClass={"col-span-2"}
+                                    
                                     name={`technologiesUsed-${projectIndex}`}
                                     label="Technologies Used"
                                     mapValue={keySkills}
                                     required={false}
                                   />
+                                  </ScrollIntoView>
+                                   </div>
+                                   
                                   {/* Demo URL Field ✅*/}
+                                  <div className="flex flex-col mx-auto w-full">
+                                  <ScrollIntoView>
                                   <TextField
-                                    divWrapperClass={
-                                      "flex flex-col mx-auto w-full"
-                                    }
                                     id={`demoUrl-${projectIndex}`}
                                     name={`demoUrl-${projectIndex}`}
                                     label="Live Demo URL"
@@ -556,11 +613,14 @@ export default function Page() {
                                     required={true}
                                     className={projectInfo}
                                   />
+                                  </ScrollIntoView>
+                                  </div>
+
                                   {/* Repository URL Field ✅*/}
+                                  <div className="flex flex-col mx-auto w-full">
+                                  <ScrollIntoView>
                                   <TextField
-                                    divWrapperClass={
-                                      "flex flex-col mx-auto w-full"
-                                    }
+                                    
                                     id={`repositoryUrl-${projectIndex}`}
                                     name={`repositoryUrl-${projectIndex}`}
                                     label="Repository URL"
@@ -569,11 +629,14 @@ export default function Page() {
                                     required={true}
                                     className={projectInfo}
                                   />
+                                  </ScrollIntoView>
+                                  </div>
+
                                   {/* Project Home Page Screenshot Field link✅*/}
+                                  <div className="col-span-2 flex flex-col mx-auto w-full">
+                                  <ScrollIntoView>
                                   <TextField
-                                    divWrapperClass={
-                                      "col-span-2 flex flex-col mx-auto w-full"
-                                    }
+                                    
                                     id={`screenshotUrl-${projectIndex}`}
                                     name={`screenshotUrl-${projectIndex}`}
                                     label="Project Home Page Screenshot URL"
@@ -585,35 +648,42 @@ export default function Page() {
                                       " col-span-2 flex flex-col mx-auto"
                                     }
                                   />
+                                  </ScrollIntoView>
+                                  </div>
                                 </React.Fragment>
                               );
                             }
                           )}
 
                           {/* Add more projects ✅*/}
-                          <div className="flex mx-auto justify-center col-span-2">
-                            <button
+                          <div className="flex mx-auto justify-center col-span-2"
+                          >
+                            <m.button
+                            initial={{scale:1, opacity:1}}
+                          whileHover={{scale:1.15}}
+                          animate={{backgroundColor:["#00ff00ff","#04558bff","#f79031ff", "#00ff00ff"]}}
+                          transition={{duration:2, repeat:Infinity, repeatType:"mirror"}}
                               type="button"
                               onClick={handleAddProject}
-                              className="border-black border-[2px] w-[75%] bg-green-600 text-white font-medium py-2 px-4 rounded-2xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300"
+                              className="w-[90%] bg-green-600 text-white font-medium py-2 px-4 rounded-2xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300"
                             >
                               Add Another Project
-                            </button>
+                            </m.button>
                           </div>
                         </div>
-
-                        {/* Submit Button ✅*/}
+                          {/* Submit Button ✅*/}
                         <div className="mt-8 mb-4 w-full flex justify-center">
                           <button className="w-[75%] bg-blue-600 text-white font-medium py-3 px-4 rounded-2xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-black">
                             Submit Portfolio
                           </button>
                         </div>
-
-                        {/*End of wrapper center ️✅*/}
+                      {/*End of wrapper center ️✅*/}
                       </div>
+                      
                     </FormSection>
                   </form>
                 </m.div>
+                 
               </>
             ) : (
               <div className="mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-2xl text-center">
@@ -627,7 +697,10 @@ export default function Page() {
             )}
           </>
         )}
+          </>
+        )}
       </div>
-    </div>
+      </div>
+
   );
 }
